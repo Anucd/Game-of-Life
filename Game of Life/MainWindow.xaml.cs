@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace Game_of_Life
 {
@@ -22,7 +23,7 @@ namespace Game_of_Life
     {
         const int squareZise = 20;
         int numberBlack = 0, numberWhite = 0;
-        int count = 0;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -76,8 +77,18 @@ namespace Game_of_Life
         /// <param name="e"></param>
         private void R_MouseEnter(object sender, MouseEventArgs e)
         {
+            int zähler = 0;
+
             if (Mouse.LeftButton == MouseButtonState.Pressed)
-                ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
+                ((Rectangle)sender).Fill =  ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
+
+            foreach (Rectangle child in Playfield.Children)
+            {
+                if (child.Fill == Brushes.White)
+                {
+                    Debug.WriteLine(zähler++);
+                }
+            }
         }
 
         /// <summary>
