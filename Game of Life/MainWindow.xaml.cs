@@ -22,7 +22,10 @@ namespace Game_of_Life
     public partial class MainWindow : Window
     {
         const int squareZise = 20;
-        int numberBlack = 0, numberWhite = 0;
+        bool SBtnZustand = true;
+        Stopwatch timer = new Stopwatch();
+        
+
 
         public MainWindow()
         {
@@ -103,7 +106,27 @@ namespace Game_of_Life
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
-           
+            // Wenn Btn zum Starten bestätigt wurde
+            if (SBtnZustand)
+            {
+                timer.Start();  // Startet Timer
+                TimerTxt2.Text = timer.Elapsed.ToString(); // Zeigt die Vergangene Zeit seit dem Timer gestartet wurde
+                StartBtn.Content = "Stopen"; // Setzt den Btn Text auf Stopen
+                SBtnZustand = false; // Setzt die Variable SBtnZustand auf false damit der Button Zustand ermittelt werden kann
+            }
+
+            // Wenn Btn zum Stoppen betätigt wurde
+            else
+            {
+                timer.Stop(); // Stopt den Timer
+                timer.Reset(); // Setzt den Timer auf null
+                TimerTxt2.Text = "Gestoppt!"; // Setzt den Timer Txt auf Gestoppt
+                StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
+                SBtnZustand = true; // Setzt die Variable SBtnZustand auf true damit der Button Zustand ermittelt werden kann
+            }
+
+            // ToDO... Timer Text muss nach jedem Berechnen einmal aktualiesiert werden.
+
         }
     }
 }
