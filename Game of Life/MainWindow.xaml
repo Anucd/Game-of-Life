@@ -7,7 +7,13 @@
         mc:Ignorable="d"
         Title="Game of Life" Height="450" Width="800" ContentRendered="Window_ContentRendered">
     <Grid>
+        <Grid HorizontalAlignment="Right" Margin="56,61,61,56" Background="Silver" VerticalAlignment="Top">
+            <TextBlock Margin="10,50,10,10" x:Name="TimerTxt">Spiel läuft Seit:</TextBlock>
+            <TextBlock Margin="10,75,10,10" x:Name="TimerTxt2">Gestoppt!</TextBlock>
+        </Grid>
+        <Grid HorizontalAlignment="Right" Margin="56,61,61,56" VerticalAlignment="Top">
+            <Button Margin="10" x:Name="StartBtn" Content="Starten"  Width="75" Click="ButtonStart_Click"/>
+        </Grid>
         <Canvas x:Name="Playfield" Width="320" Height="180" ClipToBounds="True" />
-        <Button Content="Start!" HorizontalAlignment="Left" Margin="56,61,0,0" VerticalAlignment="Top" Width="75" Click="ButtonStart_Click"/>
     </Grid>
 </Window>
