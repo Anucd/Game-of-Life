@@ -45,31 +45,34 @@ namespace Game_of_Life
             bool doneDrawingPlayfield = false;
             int nextY = 0, nextX = 0;
 
-            while (doneDrawingPlayfield == false)
+            while (doneDrawingPlayfield == false) // Wird solange ausgeführt bis Spielfeld generiert wurde
             {
-                Rectangle r = new Rectangle
+                Rectangle r = new Rectangle // Erstellt ein Rechteck in der Variable r
                 {
-                    Width = squareZise - 2.0,
-                    Height = squareZise - 2.0,
-                    Stroke = Brushes.DarkGray,
-                    Fill = Brushes.White
+                    Width = squareZise - 2.0, // Gibt die Breite des Rechtecks an
+                    Height = squareZise - 2.0, // Gibt die Höhe des Rechtecks an
+                    Stroke = Brushes.DarkGray, // Wenn Stroke dann soll das Rechteck DarkGrey sein
+                    Fill = Brushes.White // Wenn Fill dann soll das Rechteck White sein
                 };
-                Playfield.Children.Add(r);
+                Playfield.Children.Add(r); // Fügt einen Rechteck als Kindelement zu Playfield hinzu
                 Canvas.SetTop(r, nextY);
                 Canvas.SetLeft(r, nextX);
 
-                nextX += squareZise;
-                if(nextX >= Playfield.ActualWidth)
+                nextX += squareZise; // Rutscht um eine X Coordinate nach Rechts
+                if(nextX >= Playfield.ActualWidth) // Prüft ob die aktuelle Position den rechten Rand des Elternelements erreicht hat
                 {
-                    nextX = 0;
-                    nextY += squareZise;
+                    nextX = 0; // Setzt X wieder auf 0
+                    nextY += squareZise; // erhöht Y um 1 und rutscht somit eins tiefer
                 }
 
                 r.MouseEnter += R_MouseEnter;
                 r.MouseDown += R_MouseDown;
 
-                if (nextY >= Playfield.ActualHeight)
-                    doneDrawingPlayfield = true;
+                if (nextY >= Playfield.ActualHeight) // Prüft ob die aktuelle Position den unteren Rand des Elternelements erreicht hat
+                {
+                    doneDrawingPlayfield = true; // Speichert True in doneDrawingPlayfield um Spielfeld Generierung abzuschließen
+                }
+                    
             }
         }
 
