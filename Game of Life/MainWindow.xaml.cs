@@ -24,7 +24,8 @@ namespace Game_of_Life
         const int squareZise = 20;
         bool SBtnZustand = true;
         Stopwatch timer = new Stopwatch();
-        
+        int maxX = 0; // Maximale Breite des Spielfelds
+        int maxY = 0; // Maximale Höhe des Spielfelds
 
 
         public MainWindow()
@@ -49,18 +50,19 @@ namespace Game_of_Life
             {
                 Rectangle r = new Rectangle // Erstellt ein Rechteck in der Variable r
                 {
-                    Width = squareZise - 2.0, // Gibt die Breite des Rechtecks an
-                    Height = squareZise - 2.0, // Gibt die Höhe des Rechtecks an
+                    Width = squareZise - 2.0, // Gibt die Höhe des Rechtecks an
+                    Height = squareZise - 2.0, // Gibt die Breite des Rechtecks an
                     Stroke = Brushes.DarkGray, // Wenn Stroke dann soll das Rechteck DarkGrey sein
-                    Fill = Brushes.White // Wenn Fill dann soll das Rechteck White sein
+                    Fill = Brushes.White, // Wenn Fill dann soll das Rechteck White sein
+                    Margin = new Thickness(nextX, nextY, 0, 0) // Fügt eine Margin für die Positionierung hinzu
                 };
                 Playfield.Children.Add(r); // Fügt einen Rechteck als Kindelement zu Playfield hinzu
-                Canvas.SetTop(r, nextY);
-                Canvas.SetLeft(r, nextX);
 
                 nextX += squareZise; // Rutscht um eine X Coordinate nach Rechts
                 if(nextX >= Playfield.ActualWidth) // Prüft ob die aktuelle Position den rechten Rand des Elternelements erreicht hat
                 {
+                    maxX = nextX;
+                    x.Text = "X: " + maxX.ToString();
                     nextX = 0; // Setzt X wieder auf 0
                     nextY += squareZise; // erhöht Y um 1 und rutscht somit eins tiefer
                 }
@@ -70,6 +72,8 @@ namespace Game_of_Life
 
                 if (nextY >= Playfield.ActualHeight) // Prüft ob die aktuelle Position den unteren Rand des Elternelements erreicht hat
                 {
+                    maxY = nextY;
+                    y.Text = "Y: " + maxY.ToString();
                     doneDrawingPlayfield = true; // Speichert True in doneDrawingPlayfield um Spielfeld Generierung abzuschließen
                 }
                     
@@ -83,17 +87,11 @@ namespace Game_of_Life
         /// <param name="e"></param>
         private void R_MouseEnter(object sender, MouseEventArgs e)
         {
-            int zähler = 0;
-
             if (Mouse.LeftButton == MouseButtonState.Pressed)
-                ((Rectangle)sender).Fill =  ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
-
-            foreach (Rectangle child in Playfield.Children)
             {
-                if (child.Fill == Brushes.White)
-                {
-                    Debug.WriteLine(zähler++);
-                }
+                ((Rectangle)sender).Fill = ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
+                ax.Text = "X: " + ((Rectangle)sender).Margin.Left.ToString();
+                ay.Text = "Y: " + ((Rectangle)sender).Margin.Top.ToString();
             }
         }
 
@@ -105,6 +103,9 @@ namespace Game_of_Life
         private void R_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
+            ax.Text = "X: "+((Rectangle)sender).Margin.Left.ToString();
+            ay.Text = "Y: "+((Rectangle)sender).Margin.Top.ToString();
+
         }
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
@@ -116,6 +117,8 @@ namespace Game_of_Life
                 TimerTxt2.Text = timer.Elapsed.ToString(); // Zeigt die Vergangene Zeit seit dem Timer gestartet wurde
                 StartBtn.Content = "Stopen"; // Setzt den Btn Text auf Stopen
                 SBtnZustand = false; // Setzt die Variable SBtnZustand auf false damit der Button Zustand ermittelt werden kann
+            
+                
             }
 
             // Wenn Btn zum Stoppen betätigt wurde
@@ -128,8 +131,40 @@ namespace Game_of_Life
                 SBtnZustand = true; // Setzt die Variable SBtnZustand auf true damit der Button Zustand ermittelt werden kann
             }
 
+
             // ToDO... Timer Text muss nach jedem Berechnen einmal aktualiesiert werden.
 
+        }
+
+        private void positionErmittelung()
+        {
+
+            int ix = 0;
+            bool ex = true;
+            int iy = 0;
+
+            while (true) // Wird beendet sobald Methode ein Return abgegeben wird
+            {
+                if (ex)
+                {
+                    ix += squareZise;
+                }
+                else
+                {
+                    iy += squareZise;
+
+                    if (iy >= Playfield.ActualHeight)
+                    {
+                        x.Text = ix.ToString();
+                        y.Text = iy.ToString();
+                        // return ix.ToString() + "," + iy.ToString();
+                    }
+                }
+                if (ix >= Playfield.ActualWidth)
+                {
+                    ex = false;
+                }
+            }
         }
     }
 }
