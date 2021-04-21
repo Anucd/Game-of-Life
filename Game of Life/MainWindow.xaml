@@ -9,7 +9,13 @@
     <Grid>
         <Grid HorizontalAlignment="Right" Margin="56,61,61,56" Background="Silver" VerticalAlignment="Top">
             <TextBlock Margin="10,50,10,10" x:Name="TimerTxt">Spiel läuft Seit:</TextBlock>
-            <TextBlock Margin="10,75,10,10" x:Name="TimerTxt2">Gestoppt!</TextBlock>
+            <TextBlock Margin="10,70,10,10" x:Name="TimerTxt2">Gestoppt!</TextBlock>
+            <TextBlock Margin="10,100,10,10">Maximale Größe:</TextBlock>
+            <TextBlock Margin="10,120,10,10" x:Name="x">X:</TextBlock>
+            <TextBlock Margin="10,135,10,10" x:Name="y">Y:</TextBlock>
+            <TextBlock Margin="10,165,10,10">Aktuelles Element:</TextBlock>
+            <TextBlock Margin="10,185,10,10" x:Name="ax">X: ---</TextBlock>
+            <TextBlock Margin="10,200,10,10" x:Name="ay">Y: ---</TextBlock>
         </Grid>
         <Grid HorizontalAlignment="Right" Margin="56,61,61,56" VerticalAlignment="Top">
             <Button Margin="10" x:Name="StartBtn" Content="Starten"  Width="75" Click="ButtonStart_Click"/>
