@@ -8,7 +8,8 @@
         Title="Game of Life" Height="450" Width="800" ContentRendered="Window_ContentRendered">
     <Grid>
         <Grid HorizontalAlignment="Right" Margin="56,61,61,56" Background="Silver" VerticalAlignment="Top">
-            <TextBlock Margin="10,50,10,10" x:Name="TimerTxt">Spiel läuft Seit:</TextBlock>
+            <Button HorizontalAlignment="Right" Margin="0,10,20,0" VerticalAlignment="Top" x:Name="StartBtn" Content="Starten"  Width="75" Click="ButtonStart_Click"/>
+            <TextBlock Margin="10,35,10,25" x:Name="TimerTxt">Spiel läuft Seit:</TextBlock>
             <TextBlock Margin="10,70,10,10" x:Name="TimerTxt2">Gestoppt!</TextBlock>
             <TextBlock Margin="10,100,10,10">Maximale Größe:</TextBlock>
             <TextBlock Margin="10,120,10,10" x:Name="x">X:</TextBlock>
@@ -17,9 +18,6 @@
             <TextBlock Margin="10,185,10,10" x:Name="ax">X: ---</TextBlock>
             <TextBlock Margin="10,200,10,10" x:Name="ay">Y: ---</TextBlock>
         </Grid>
-        <Grid HorizontalAlignment="Right" Margin="56,61,61,56" VerticalAlignment="Top">
-            <Button Margin="10" x:Name="StartBtn" Content="Starten"  Width="75" Click="ButtonStart_Click"/>
-        </Grid>
-        <Canvas x:Name="Playfield" Width="320" Height="180" ClipToBounds="True" />
+        <Canvas x:Name="Spielfeld" ClipToBounds="False" Margin="43,37,203,43" />
     </Grid>
 </Window>

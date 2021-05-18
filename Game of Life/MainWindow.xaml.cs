@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using System.Threading;
+
+
 
 namespace Game_of_Life
 {
@@ -21,11 +17,16 @@ namespace Game_of_Life
     /// </summary>
     public partial class MainWindow : Window
     {
-        const int squareZise = 20;
-        bool SBtnZustand = true;
+        const int breiteViereck = 25;
+        const int hoeheViereck = 25;
+        Rectangle[,] zellen = new Rectangle[breiteViereck, hoeheViereck];
+        //int naechstesY = 0, naechstesX = 0;
+        bool SBtnZustand = false;
         Stopwatch timer = new Stopwatch();
         int maxX = 0; // Maximale Breite des Spielfelds
         int maxY = 0; // Maximale Höhe des Spielfelds
+        //Thread th1;
+
 
 
         public MainWindow()
@@ -35,53 +36,56 @@ namespace Game_of_Life
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            DrawPlayfield();
+            erstelleSpielfeld();
         }
 
         /// <summary>
-        /// Creates the Playfield
+        /// Erstellt das Spielfeld
         /// </summary>
-        private void DrawPlayfield()
+        private void erstelleSpielfeld()
         {
-            bool doneDrawingPlayfield = false;
-            int nextY = 0, nextX = 0;
-
-            while (doneDrawingPlayfield == false) // Wird solange ausgeführt bis Spielfeld generiert wurde
+            for(int i = 0; i < breiteViereck; i++)
             {
-                Rectangle r = new Rectangle // Erstellt ein Rechteck in der Variable r
+                for(int j = 0; j < hoeheViereck; j++)
                 {
-                    Width = squareZise - 2.0, // Gibt die Höhe des Rechtecks an
-                    Height = squareZise - 2.0, // Gibt die Breite des Rechtecks an
-                    Stroke = Brushes.DarkGray, // Wenn Stroke dann soll das Rechteck DarkGrey sein
-                    Fill = Brushes.White, // Wenn Fill dann soll das Rechteck White sein
-                    Margin = new Thickness(nextX, nextY, 0, 0) // Fügt eine Margin für die Positionierung hinzu
-                };
-                Playfield.Children.Add(r); // Fügt einen Rechteck als Kindelement zu Playfield hinzu
+                    Rectangle r = new Rectangle     // Erstellt ein Rechteck in der Variable r
+                    {
+                        Width = Spielfeld.ActualWidth / breiteViereck - 1.0, // Gibt die Höhe des Rechtecks an
+                        Height = Spielfeld.ActualWidth / hoeheViereck - 3.0, // Gibt die Breite des Rechtecks an
+                        Stroke = Brushes.DarkGray,                           // Verleiht Zellen einen grauen Rand
+                        Fill = Brushes.White,                                // Gibt die Farbe des Inhalts der Zellen an
+                        //Margin = new Thickness(naechstesX, naechstesY, 0, 0) // Fügt eine Margin für die Positionierung hinzu
+                    };
+                    Spielfeld.Children.Add(r);   // Fügt ein Rechteck als Kindelement zu Spielfeld hinzu
 
-                nextX += squareZise; // Rutscht um eine X Coordinate nach Rechts
-                if(nextX >= Playfield.ActualWidth) // Prüft ob die aktuelle Position den rechten Rand des Elternelements erreicht hat
-                {
-                    maxX = nextX;
-                    x.Text = "X: " + maxX.ToString();
-                    nextX = 0; // Setzt X wieder auf 0
-                    nextY += squareZise; // erhöht Y um 1 und rutscht somit eins tiefer
-                }
+                    Canvas.SetLeft(r, j * Spielfeld.ActualWidth / breiteViereck);
+                    Canvas.SetTop(r, i * Spielfeld.ActualHeight / hoeheViereck);
+                    /*naechstesX += breiteViereck;            // Rutscht um eine X Koordinate nach Rechts
+                    if (naechstesX >= Spielfeld.ActualWidth) // Prüft ob die aktuelle Position den rechten Rand des Elternelements erreicht hat
+                    {
+                        maxX = naechstesX;
+                        x.Text = "X: " + maxX.ToString();
+                        naechstesX = 0;             // Setzt X wieder auf 0
+                        naechstesY += hoeheViereck; // erhöht Y um hoeheViereck und rutscht somit eins tiefer
+                    }
 
-                r.MouseEnter += R_MouseEnter;
-                r.MouseDown += R_MouseDown;
-
-                if (nextY >= Playfield.ActualHeight) // Prüft ob die aktuelle Position den unteren Rand des Elternelements erreicht hat
-                {
-                    maxY = nextY;
-                    y.Text = "Y: " + maxY.ToString();
-                    doneDrawingPlayfield = true; // Speichert True in doneDrawingPlayfield um Spielfeld Generierung abzuschließen
-                }
                     
+
+                    if (naechstesY >= Spielfeld.ActualHeight) // Prüft ob die aktuelle Position den unteren Rand des Elternelements erreicht hat
+                    {
+                        maxY = naechstesY;
+                        y.Text = "Y: " + maxY.ToString();
+                    }*/
+                    r.MouseEnter += R_MouseEnter;
+                    r.MouseDown += R_MouseDown;
+
+                    zellen[i, j] = r;
+                }
             }
         }
-
+        
         /// <summary>
-        /// Changes colors of cells but only if the user holds down the left mouse button and enters a cell
+        /// Ändert die Farbe einer Zelle nur wenn der Benutzer die linke Maustaste gedrückt hält und eine Zelle betritt
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -96,7 +100,7 @@ namespace Game_of_Life
         }
 
         /// <summary>
-        /// Changes color of cells when user clicks on a cell
+        /// Änder die Farbe einer Zelle wenn der Benutzer die linke Maustaste drückt
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -110,33 +114,106 @@ namespace Game_of_Life
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
+            /*th1 = new Thread(ThreadStart(Logik));
+            th1.Start();*/
+            Logik();
+            /*if (SBtnZustand == false)
+            {
+                SBtnZustand = true;
+            }
+            else if (SBtnZustand == true)
+            {
+                SBtnZustand = false;
+                return;
+            }*/
+
+
+
             // Wenn Btn zum Starten bestätigt wurde
-            if (SBtnZustand)
-            {
-                timer.Start();  // Startet Timer
-                TimerTxt2.Text = timer.Elapsed.ToString(); // Zeigt die Vergangene Zeit seit dem Timer gestartet wurde
-                StartBtn.Content = "Stopen"; // Setzt den Btn Text auf Stopen
-                SBtnZustand = false; // Setzt die Variable SBtnZustand auf false damit der Button Zustand ermittelt werden kann
-            
-                
-            }
-
-            // Wenn Btn zum Stoppen betätigt wurde
-            else
-            {
-                timer.Stop(); // Stopt den Timer
-                timer.Reset(); // Setzt den Timer auf null
-                TimerTxt2.Text = "Gestoppt!"; // Setzt den Timer Txt auf Gestoppt
-                StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
-                SBtnZustand = true; // Setzt die Variable SBtnZustand auf true damit der Button Zustand ermittelt werden kann
-            }
+            /*if (SBtnZustand)
+     {
+         timer.Start();  // Startet Timer
+         TimerTxt2.Text = timer.Elapsed.ToString(); // Zeigt die Vergangene Zeit seit dem Timer gestartet wurde
+         StartBtn.Content = "Stoppen"; // Setzt den Btn Text auf Stoppen
+         SBtnZustand = false; // Setzt die Variable SBtnZustand auf false damit der Button Zustand ermittelt werden kann
 
 
-            // ToDO... Timer Text muss nach jedem Berechnen einmal aktualiesiert werden.
+     }
 
+     // Wenn Btn zum Stoppen betätigt wurde
+     else
+     {
+         timer.Stop(); // Stopt den Timer
+         timer.Reset(); // Setzt den Timer auf null
+         TimerTxt2.Text = "Gestoppt!"; // Setzt den Timer Txt auf Gestoppt
+         StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
+         SBtnZustand = true; // Setzt die Variable SBtnZustand auf true damit der Button Zustand ermittelt werden kann
+     }
+
+
+     // ToDO... Timer Text muss nach jedem Berechnen einmal aktualiesiert werden.
+     */
         }
 
-        private void positionErmittelung()
+        private void Logik()
+        {
+            int[,] anzahlNachbarn = new int[breiteViereck, hoeheViereck];
+            for (int i = 0; i < breiteViereck; i++)
+            {
+                for (int j = 0; j < hoeheViereck; j++)
+                {
+                    int nachbarn = 0;
+                    int obenTorus = i - 1;
+                    int untenTorus = i + 1;
+                    int rechtsTorus = j + 1;
+                    int linksTorus = j - 1;
+                    if (obenTorus < 0)
+                    { obenTorus = hoeheViereck - 1; }
+                    if (untenTorus == hoeheViereck)
+                    { untenTorus = 0; }
+                    if (rechtsTorus == breiteViereck)
+                    { rechtsTorus = 0; }
+                    if (linksTorus < 0)
+                    { linksTorus = breiteViereck - 1; }
+
+                    if (zellen[obenTorus, linksTorus].Fill == Brushes.Black)
+                    { nachbarn++; }
+                    if (zellen[obenTorus, j].Fill == Brushes.Black)
+                    { nachbarn++; }
+                    if (zellen[obenTorus, rechtsTorus].Fill == Brushes.Black)
+                    { nachbarn++; }
+                    if (zellen[i, linksTorus].Fill == Brushes.Black)
+                    { nachbarn++; }
+                    if (zellen[i, rechtsTorus].Fill == Brushes.Black)
+                    { nachbarn++; }
+                    if (zellen[untenTorus, linksTorus].Fill == Brushes.Black)
+                    { nachbarn++; }
+                    if (zellen[untenTorus, j].Fill == Brushes.Black)
+                    { nachbarn++; }
+                    if (zellen[untenTorus, rechtsTorus].Fill == Brushes.Black)
+                    { nachbarn++; }
+
+                    anzahlNachbarn[i, j] = nachbarn;
+                }
+            }
+            for (int i = 0; i < breiteViereck; i++)
+            {
+                for (int j = 0; j < hoeheViereck; j++)
+                {
+                    if (anzahlNachbarn[i, j] < 2 || anzahlNachbarn[i, j] > 3)
+                    {
+                        zellen[i, j].Fill = Brushes.White;
+                    }
+                    else if (anzahlNachbarn[i, j] == 3)
+                    {
+                        zellen[i, j].Fill = Brushes.Black;
+                    }
+                }
+            }
+        }        
+
+
+        /*private void positionErmittlung()
         {
 
             int ix = 0;
@@ -147,24 +224,24 @@ namespace Game_of_Life
             {
                 if (ex)
                 {
-                    ix += squareZise;
+                    ix += viereckGroeße;
                 }
                 else
                 {
-                    iy += squareZise;
+                    iy += viereckGroeße;
 
-                    if (iy >= Playfield.ActualHeight)
+                    if (iy >= Spielfeld.ActualHeight)
                     {
                         x.Text = ix.ToString();
                         y.Text = iy.ToString();
                         // return ix.ToString() + "," + iy.ToString();
                     }
                 }
-                if (ix >= Playfield.ActualWidth)
+                if (ix >= Spielfeld.ActualWidth)
                 {
                     ex = false;
                 }
             }
-        }
+        }*/
     }
 }
