@@ -18,11 +18,15 @@ namespace Game_of_Life
         const int breiteViereck = 25;
         const int hoeheViereck = 25;
         Rectangle[,] zellen = new Rectangle[breiteViereck, hoeheViereck];
-        //int naechstesY = 0, naechstesX = 0;
         bool SBtnZustand = false;
         Stopwatch timer = new Stopwatch();
         int maxX = 0; // Maximale Breite des Spielfelds
         int maxY = 0; // Maximale Höhe des Spielfelds
+        Random rand = new Random();
+        Brush[] brushes = new Brush[] {
+            Brushes.Black,
+            Brushes.White
+        };
         public MainWindow()
         {
             InitializeComponent();
@@ -88,9 +92,12 @@ namespace Game_of_Life
             ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
             ax.Text = "X: "+((Rectangle)sender).Margin.Left.ToString();
             ay.Text = "Y: "+((Rectangle)sender).Margin.Top.ToString();
-
         }
-
+        /// <summary>
+        /// Startet/Stoppt das Game of Life
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
             if (SBtnZustand == false)
@@ -108,8 +115,8 @@ namespace Game_of_Life
                 StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
                 return;
             }
-
         }
+
         /*if (SBtnZustand)
          {
              timer.Start();  // Startet Timer
@@ -202,14 +209,30 @@ namespace Game_of_Life
             StartBtn.Content = "Starten";
         }
 
+        //Erstellt zufällig belebte/tote Zellen
+        private void ButtonZufall_Click(object sender, RoutedEventArgs e)
+        {
+            Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = brushes[rand.Next(brushes.Length)]);
+        }
+
+        /// <summary>
+        /// Schrittweiser Generationswechsel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonSchritt_Click(object sender, RoutedEventArgs e)
         {
             GenerationsWechsel();
         }
 
-        private void HilfeButton_Click(object sender, RoutedEventArgs eventArgs)
+        /// <summary>
+        /// Öffnet eine Messagebox mit Anwendungshilfe
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs"></param>
+        private void ButtonHilfe_Click(object sender, RoutedEventArgs eventArgs)
         {
-            MessageBox.Show("Ein Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist eine Zelle, welche einen von zwei Zuständen besitzen kann: tot (weiß) oder lebendig (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Zellen auf dem Spielfeld platziert. (Maustaste betätigen)\r\n\r\nMit einem Mausklick auf die „Starten“-Taste kann nun das Spiel beginnen.\r\n\r\nJede lebende oder tote Zelle hat auf diesem Spielfeld genau acht Nachbarzellen, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Eine tote Zelle mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Zellen mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Zellen mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
+            MessageBox.Show("Willkommen zum Game of Life.\r\n\r\nEin Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist eine Zelle, welche einen von zwei Zuständen besitzen kann: tot (weiß) oder lebendig (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Zellen auf dem Spielfeld platziert. (Maustaste betätigen)\r\n\r\nDer „Zufall“ -Button ermöglich eine Generation von zufällig belebten oder toten Zellen.\r\n\r\nMit einem Mausklick auf die „Starten“-Taste kann nun das Spiel beginnen.\r\n\r\nJede lebende oder tote Zelle hat auf diesem Spielfeld genau acht Nachbarzellen, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Eine tote Zelle mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Zellen mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Zellen mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
         }
 
         /*private void positionErmittlung()
