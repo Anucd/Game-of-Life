@@ -6,8 +6,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Diagnostics;
-using System.Threading;
-using System.ComponentModel;
 using System.Linq;
 
 namespace Game_of_Life
@@ -25,7 +23,6 @@ namespace Game_of_Life
         Stopwatch timer = new Stopwatch();
         int maxX = 0; // Maximale Breite des Spielfelds
         int maxY = 0; // Maximale Höhe des Spielfelds
-
         public MainWindow()
         {
             InitializeComponent();
@@ -47,32 +44,17 @@ namespace Game_of_Life
                 {
                     Rectangle r = new Rectangle     // Erstellt ein Rechteck in der Variable r
                     {
-                        Width = Spielfeld.ActualWidth / breiteViereck - 1.0, // Gibt die Höhe des Rechtecks an
-                        Height = Spielfeld.ActualWidth / hoeheViereck - 3.0, // Gibt die Breite des Rechtecks an
-                        Stroke = Brushes.DarkGray,                           // Verleiht Zellen einen grauen Rand
-                        Fill = Brushes.White,                                // Gibt die Farbe des Inhalts der Zellen an
-                        //Margin = new Thickness(naechstesX, naechstesY, 0, 0) // Fügt eine Margin für die Positionierung hinzu
+                        Width = Spielfeld.ActualWidth / breiteViereck - 2.0,    // Gibt die Breite des Rechtecks an
+                        Height = Spielfeld.ActualHeight / hoeheViereck - 2.0,   // Gibt die Höhe des Rechtecks an
+                        Stroke = Brushes.DarkGray,                              // Verleiht Zellen einen grauen Rand
+                        Fill = Brushes.White,                                   // Gibt die Farbe des Inhalts der Zellen an
                     };
-                    Spielfeld.Children.Add(r);   // Fügt ein Rechteck als Kindelement zu Spielfeld hinzu
+                    Console.WriteLine(Spielfeld.ActualWidth);
+                    Spielfeld.Children.Add(r);      // Fügt ein Rechteck als Kindelement zu Spielfeld hinzu
 
                     Canvas.SetLeft(r, j * Spielfeld.ActualWidth / breiteViereck);
                     Canvas.SetTop(r, i * Spielfeld.ActualHeight / hoeheViereck);
-                    /*naechstesX += breiteViereck;            // Rutscht um eine X Koordinate nach Rechts
-                    if (naechstesX >= Spielfeld.ActualWidth) // Prüft ob die aktuelle Position den rechten Rand des Elternelements erreicht hat
-                    {
-                        maxX = naechstesX;
-                        x.Text = "X: " + maxX.ToString();
-                        naechstesX = 0;             // Setzt X wieder auf 0
-                        naechstesY += hoeheViereck; // erhöht Y um hoeheViereck und rutscht somit eins tiefer
-                    }
 
-                    
-
-                    if (naechstesY >= Spielfeld.ActualHeight) // Prüft ob die aktuelle Position den unteren Rand des Elternelements erreicht hat
-                    {
-                        maxY = naechstesY;
-                        y.Text = "Y: " + maxY.ToString();
-                    }*/
                     r.MouseEnter += R_MouseEnter;
                     r.MouseDown += R_MouseDown;
 
@@ -116,7 +98,7 @@ namespace Game_of_Life
                 SBtnZustand = true;
                 StartBtn.Content = "Stoppen"; // Setzt den Btn Text auf Stoppen
                 while (SBtnZustand) {
-                    await GenerationsWechsel();
+                    GenerationsWechsel();
                     await Task.Delay(250);
                 }
             }
@@ -149,7 +131,7 @@ namespace Game_of_Life
              // ToDO... Timer Text muss nach jedem Berechnen einmal aktualiesiert werden.
              */
 
-        private async Task GenerationsWechsel()
+        private void GenerationsWechsel()
         {
             int[,] anzahlNachbarn = new int[breiteViereck, hoeheViereck];
 
@@ -220,34 +202,44 @@ namespace Game_of_Life
             StartBtn.Content = "Starten";
         }
 
-            /*private void positionErmittlung()
+        private void ButtonSchritt_Click(object sender, RoutedEventArgs e)
+        {
+            GenerationsWechsel();
+        }
+
+        private void HilfeButton_Click(object sender, RoutedEventArgs eventArgs)
+        {
+            MessageBox.Show("Ein Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist eine Zelle, welche einen von zwei Zuständen besitzen kann: tot (weiß) oder lebendig (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Zellen auf dem Spielfeld platziert. (Maustaste betätigen)\r\n\r\nMit einem Mausklick auf die „Starten“-Taste kann nun das Spiel beginnen.\r\n\r\nJede lebende oder tote Zelle hat auf diesem Spielfeld genau acht Nachbarzellen, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Eine tote Zelle mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Zellen mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Zellen mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
+        }
+
+        /*private void positionErmittlung()
+        {
+            int ix = 0;
+            bool ex = true;
+            int iy = 0;
+
+            while (true) // Wird beendet sobald Methode ein Return abgegeben wird
             {
-                int ix = 0;
-                bool ex = true;
-                int iy = 0;
-
-                while (true) // Wird beendet sobald Methode ein Return abgegeben wird
+                if (ex)
                 {
-                    if (ex)
-                    {
-                        ix += viereckGroeße;
-                    }
-                    else
-                    {
-                        iy += viereckGroeße;
+                    ix += viereckGroeße;
+                }
+                else
+                {
+                    iy += viereckGroeße;
 
-                        if (iy >= Spielfeld.ActualHeight)
-                        {
-                            x.Text = ix.ToString();
-                            y.Text = iy.ToString();
-                            // return ix.ToString() + "," + iy.ToString();
-                        }
-                    }
-                    if (ix >= Spielfeld.ActualWidth)
+                    if (iy >= Spielfeld.ActualHeight)
                     {
-                        ex = false;
+                        x.Text = ix.ToString();
+                        y.Text = iy.ToString();
+                        // return ix.ToString() + "," + iy.ToString();
                     }
                 }
-            }*/
-        }
+                if (ix >= Spielfeld.ActualWidth)
+                {
+                    ex = false;
+                }
+            }
+        }*/
+    }
 }
