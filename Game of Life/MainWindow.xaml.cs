@@ -7,8 +7,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Threading;
-
-
+using System.ComponentModel;
+using System.Linq;
 
 namespace Game_of_Life
 {
@@ -25,9 +25,6 @@ namespace Game_of_Life
         Stopwatch timer = new Stopwatch();
         int maxX = 0; // Maximale Breite des Spielfelds
         int maxY = 0; // Maximale Höhe des Spielfelds
-        //Thread th1;
-
-
 
         public MainWindow()
         {
@@ -100,7 +97,7 @@ namespace Game_of_Life
         }
 
         /// <summary>
-        /// Änder die Farbe einer Zelle wenn der Benutzer die linke Maustaste drückt
+        /// Ändert die Farbe einer Zelle wenn der Benutzer die linke Maustaste drückt
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -112,52 +109,50 @@ namespace Game_of_Life
 
         }
 
-        private void ButtonStart_Click(object sender, RoutedEventArgs e)
+        private async void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
-            /*th1 = new Thread(ThreadStart(Logik));
-            th1.Start();*/
-            Logik();
-            /*if (SBtnZustand == false)
+            if (SBtnZustand == false)
             {
                 SBtnZustand = true;
+                StartBtn.Content = "Stoppen"; // Setzt den Btn Text auf Stoppen
+                while (SBtnZustand) {
+                    await GenerationsWechsel();
+                    await Task.Delay(250);
+                }
             }
-            else if (SBtnZustand == true)
+            else
             {
                 SBtnZustand = false;
+                StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
                 return;
-            }*/
+            }
 
-
-
-            // Wenn Btn zum Starten bestätigt wurde
-            /*if (SBtnZustand)
-     {
-         timer.Start();  // Startet Timer
-         TimerTxt2.Text = timer.Elapsed.ToString(); // Zeigt die Vergangene Zeit seit dem Timer gestartet wurde
-         StartBtn.Content = "Stoppen"; // Setzt den Btn Text auf Stoppen
-         SBtnZustand = false; // Setzt die Variable SBtnZustand auf false damit der Button Zustand ermittelt werden kann
-
-
-     }
-
-     // Wenn Btn zum Stoppen betätigt wurde
-     else
-     {
-         timer.Stop(); // Stopt den Timer
-         timer.Reset(); // Setzt den Timer auf null
-         TimerTxt2.Text = "Gestoppt!"; // Setzt den Timer Txt auf Gestoppt
-         StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
-         SBtnZustand = true; // Setzt die Variable SBtnZustand auf true damit der Button Zustand ermittelt werden kann
-     }
-
-
-     // ToDO... Timer Text muss nach jedem Berechnen einmal aktualiesiert werden.
-     */
         }
+        /*if (SBtnZustand)
+         {
+             timer.Start();  // Startet Timer
+             TimerTxt2.Text = timer.Elapsed.ToString(); // Zeigt die Vergangene Zeit seit dem Timer gestartet wurde
+             StartBtn.Content = "Stoppen"; // Setzt den Btn Text auf Stoppen
+             SBtnZustand = false; // Setzt die Variable SBtnZustand auf false damit der Button Zustand ermittelt werden kann
 
-        private void Logik()
+          }
+         // Wenn Btn zum Stoppen betätigt wurde
+           else
+           {
+               timer.Stop(); // Stopt den Timer
+               timer.Reset(); // Setzt den Timer auf null
+               TimerTxt2.Text = "Gestoppt!"; // Setzt den Timer Txt auf Gestoppt
+                StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
+                SBtnZustand = true; // Setzt die Variable SBtnZustand auf true damit der Button Zustand ermittelt werden kann
+            }
+
+             // ToDO... Timer Text muss nach jedem Berechnen einmal aktualiesiert werden.
+             */
+
+        private async Task GenerationsWechsel()
         {
             int[,] anzahlNachbarn = new int[breiteViereck, hoeheViereck];
+
             for (int i = 0; i < breiteViereck; i++)
             {
                 for (int j = 0; j < hoeheViereck; j++)
@@ -194,6 +189,7 @@ namespace Game_of_Life
                     { nachbarn++; }
 
                     anzahlNachbarn[i, j] = nachbarn;
+
                 }
             }
             for (int i = 0; i < breiteViereck; i++)
@@ -210,38 +206,48 @@ namespace Game_of_Life
                     }
                 }
             }
-        }        
+        }
 
-
-        /*private void positionErmittlung()
+        /// <summary>
+        /// Setzt das Spielfeld zurück
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ButtonNeu_Click(object sender, RoutedEventArgs e)
         {
+            Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = Brushes.White);
+            SBtnZustand = false;
+            StartBtn.Content = "Starten";
+        }
 
-            int ix = 0;
-            bool ex = true;
-            int iy = 0;
-
-            while (true) // Wird beendet sobald Methode ein Return abgegeben wird
+            /*private void positionErmittlung()
             {
-                if (ex)
-                {
-                    ix += viereckGroeße;
-                }
-                else
-                {
-                    iy += viereckGroeße;
+                int ix = 0;
+                bool ex = true;
+                int iy = 0;
 
-                    if (iy >= Spielfeld.ActualHeight)
+                while (true) // Wird beendet sobald Methode ein Return abgegeben wird
+                {
+                    if (ex)
                     {
-                        x.Text = ix.ToString();
-                        y.Text = iy.ToString();
-                        // return ix.ToString() + "," + iy.ToString();
+                        ix += viereckGroeße;
+                    }
+                    else
+                    {
+                        iy += viereckGroeße;
+
+                        if (iy >= Spielfeld.ActualHeight)
+                        {
+                            x.Text = ix.ToString();
+                            y.Text = iy.ToString();
+                            // return ix.ToString() + "," + iy.ToString();
+                        }
+                    }
+                    if (ix >= Spielfeld.ActualWidth)
+                    {
+                        ex = false;
                     }
                 }
-                if (ix >= Spielfeld.ActualWidth)
-                {
-                    ex = false;
-                }
-            }
-        }*/
-    }
+            }*/
+        }
 }
