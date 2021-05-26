@@ -40,7 +40,7 @@ namespace Game_of_Life
         /// </summary>
         private void erstelleSpielfeld()
         {
-            for(int i = 0; i < breiteViereck; i++)
+            for (int i = 0; i < breiteViereck; i++)
             {
                 for(int j = 0; j < hoeheViereck; j++)
                 {

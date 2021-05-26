@@ -21,6 +21,15 @@
             <TextBlock Margin="10,120,10,128" x:Name="x">X:</TextBlock>
             <TextBlock Margin="10,135,10,114" x:Name="y">Y:</TextBlock>
         </Grid>
-        <Canvas x:Name="Spielfeld" ClipToBounds="True" Margin="43,37,203,43"/>
+        <Border 
+            BorderThickness="7"
+            
+            BorderBrush="Gray"
+            Background="LightGray"
+            Margin="43,37,203,43"
+            x:Name="SpielfeldRahmen"
+        >
+            <Canvas x:Name="Spielfeld" ClipToBounds="True" />
+        </Border>
     </Grid>
 </Window>
