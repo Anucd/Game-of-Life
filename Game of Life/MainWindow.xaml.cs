@@ -20,8 +20,6 @@ namespace Game_of_Life
         Rectangle[,] zellen = new Rectangle[breiteViereck, hoeheViereck];
         bool SBtnZustand = false;
         Stopwatch timer = new Stopwatch();
-        int maxX = 0; // Maximale Breite des Spielfelds
-        int maxY = 0; // Maximale Höhe des Spielfelds
         Random rand = new Random();
         Brush[] brushes = new Brush[] {
             Brushes.Black,
@@ -77,8 +75,6 @@ namespace Game_of_Life
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 ((Rectangle)sender).Fill = ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
-                ax.Text = "X: " + ((Rectangle)sender).Margin.Left.ToString();
-                ay.Text = "Y: " + ((Rectangle)sender).Margin.Top.ToString();
             }
         }
 
@@ -90,8 +86,6 @@ namespace Game_of_Life
         private void R_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
-            ax.Text = "X: "+((Rectangle)sender).Margin.Left.ToString();
-            ay.Text = "Y: "+((Rectangle)sender).Margin.Top.ToString();
         }
         /// <summary>
         /// Startet/Stoppt das Game of Life
@@ -100,43 +94,41 @@ namespace Game_of_Life
         /// <param name="e"></param>
         private async void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
-            if (SBtnZustand == false)
+            string timerzeit = "";
+            if (!SBtnZustand)
             {
                 SBtnZustand = true;
                 StartBtn.Content = "Stoppen"; // Setzt den Btn Text auf Stoppen
+
+                TimerTxt.Visibility = Visibility.Visible;
+                TimerTxt2.Visibility = Visibility.Visible;
+                ZufallBtn.IsEnabled = false;
+                NeuBtn.IsEnabled = false;
+                SchrittBtn.IsEnabled = false;
+                timer.Start();  // Startet Timer
                 while (SBtnZustand) {
                     GenerationsWechsel();
+                    timerzeit = timer.Elapsed.ToString();
+                    TimerTxt2.Text = timerzeit.Substring(0, timerzeit.Length -8);
                     await Task.Delay(250);
+                    
                 }
+                
             }
             else
             {
                 SBtnZustand = false;
-                StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
+                timer.Stop();
+                ZufallBtn.IsEnabled = true;
+                NeuBtn.IsEnabled = true;
+                SchrittBtn.IsEnabled = true;
+                StartBtn.Content = "Fortsetzen"; // Setzt den Btn Text auf Starten
                 return;
             }
         }
 
-        /*if (SBtnZustand)
-         {
-             timer.Start();  // Startet Timer
-             TimerTxt2.Text = timer.Elapsed.ToString(); // Zeigt die Vergangene Zeit seit dem Timer gestartet wurde
-             StartBtn.Content = "Stoppen"; // Setzt den Btn Text auf Stoppen
-             SBtnZustand = false; // Setzt die Variable SBtnZustand auf false damit der Button Zustand ermittelt werden kann
+        
 
-          }
-         // Wenn Btn zum Stoppen betätigt wurde
-           else
-           {
-               timer.Stop(); // Stopt den Timer
-               timer.Reset(); // Setzt den Timer auf null
-               TimerTxt2.Text = "Gestoppt!"; // Setzt den Timer Txt auf Gestoppt
-                StartBtn.Content = "Starten"; // Setzt den Btn Text auf Starten
-                SBtnZustand = true; // Setzt die Variable SBtnZustand auf true damit der Button Zustand ermittelt werden kann
-            }
-
-             // ToDO... Timer Text muss nach jedem Berechnen einmal aktualiesiert werden.
-             */
 
         private void GenerationsWechsel()
         {
@@ -197,6 +189,7 @@ namespace Game_of_Life
             }
         }
 
+
         /// <summary>
         /// Setzt das Spielfeld zurück
         /// </summary>
@@ -206,6 +199,9 @@ namespace Game_of_Life
         {
             Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = Brushes.White);
             SBtnZustand = false;
+            timer.Reset();
+            TimerTxt.Visibility = Visibility.Hidden;
+            TimerTxt2.Visibility = Visibility.Hidden;
             StartBtn.Content = "Starten";
         }
 
@@ -213,6 +209,9 @@ namespace Game_of_Life
         private void ButtonZufall_Click(object sender, RoutedEventArgs e)
         {
             Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = brushes[rand.Next(brushes.Length)]);
+            timer.Reset();
+            TimerTxt.Visibility = Visibility.Hidden;
+            TimerTxt2.Visibility = Visibility.Hidden;
         }
 
         /// <summary>
@@ -234,35 +233,5 @@ namespace Game_of_Life
         {
             MessageBox.Show("Willkommen zum Game of Life.\r\n\r\nEin Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist eine Zelle, welche einen von zwei Zuständen besitzen kann: tot (weiß) oder lebendig (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Zellen auf dem Spielfeld platziert. (Maustaste betätigen)\r\n\r\nDer „Zufall“ -Button ermöglich eine Generation von zufällig belebten oder toten Zellen.\r\n\r\nMit einem Mausklick auf die „Starten“-Taste kann nun das Spiel beginnen.\r\n\r\nJede lebende oder tote Zelle hat auf diesem Spielfeld genau acht Nachbarzellen, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Eine tote Zelle mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Zellen mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Zellen mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
         }
-
-        /*private void positionErmittlung()
-        {
-            int ix = 0;
-            bool ex = true;
-            int iy = 0;
-
-            while (true) // Wird beendet sobald Methode ein Return abgegeben wird
-            {
-                if (ex)
-                {
-                    ix += viereckGroeße;
-                }
-                else
-                {
-                    iy += viereckGroeße;
-
-                    if (iy >= Spielfeld.ActualHeight)
-                    {
-                        x.Text = ix.ToString();
-                        y.Text = iy.ToString();
-                        // return ix.ToString() + "," + iy.ToString();
-                    }
-                }
-                if (ix >= Spielfeld.ActualWidth)
-                {
-                    ex = false;
-                }
-            }
-        }*/
     }
 }
