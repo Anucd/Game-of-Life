@@ -5,29 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Game_of_Life"
         mc:Ignorable="d"
-        Title="Game of Life" Height="1024" Width="1280" ContentRendered="Window_ContentRendered"
-        MinHeight="600" MinWidth="800" MaxHeight="1280" MaxWidth="1920" SizeToContent="WidthAndHeight">
-    
+        Title="Game of Life" ContentRendered="Window_ContentRendered"
+        MinHeight="900" MinWidth="1200" MaxHeight="1080" MaxWidth="1920" SizeToContent="WidthAndHeight">
+
     <Grid>
-        <Grid HorizontalAlignment="Right" Margin="0,69,59,0" Background="Silver" VerticalAlignment="Top" Height="350">
-            <Button HorizontalAlignment="Right" Margin="0,10,20,0" VerticalAlignment="Top" x:Name="StartBtn" Content="Starten"  Width="75" Click="ButtonStart_Click"/>
-            <Button HorizontalAlignment="Right" Margin="0,0,20,63" VerticalAlignment="Bottom" x:Name="NeuBtn" Content="Zurücksetzen" Width="75" Click="ButtonNeu_Click"/>
-            <Button HorizontalAlignment="Right" Margin="0,0,20,43" VerticalAlignment="Bottom" x:Name="SchrittBtn" Content="Nächster Schritt" Width="75" Click="ButtonSchritt_Click"/>
-            <Button HorizontalAlignment="Right" Margin="0,0,20,3" VerticalAlignment="Bottom" x:Name="HilfeBtn" Content="Hilfe"  Width="75" Click="ButtonHilfe_Click"/>
-            <Button HorizontalAlignment="Right" Margin="0,0,20,23" VerticalAlignment="Bottom" x:Name="ZufallBtn" Content="Zufall"  Width="75" Click="ButtonZufall_Click"/>
-            <TextBlock Margin="10,35,10,193" Visibility="Hidden" x:Name="TimerTxt">Spiel läuft seit:</TextBlock>
-            <TextBlock Margin="10,55,10,168" Visibility="Hidden" x:Name="TimerTxt2">Spiel zuerst starten!</TextBlock>
-            <TextBlock Margin="10,100,10,143">Maximale Größe:</TextBlock>
-            <TextBlock Margin="10,120,10,128" x:Name="x">X:</TextBlock>
-            <TextBlock Margin="10,135,10,114" x:Name="y">Y:</TextBlock>
+        <Grid HorizontalAlignment="Center" Margin="800,0,0,415" Background="Silver" VerticalAlignment="Center" Height="75" Width="200">
+            <Button HorizontalAlignment="Right" Margin="0,7.5,7.5,0" VerticalAlignment="Top" x:Name="HilfeBtn" Content="?"  Width="20" Click="ButtonHilfe_Click" Height="20" UseLayoutRounding="False"/>
+            <TextBox x:Name="SpielfeldX" TextChanged="SpielfeldX_OnChanged" HorizontalAlignment="Left" Height="20" Margin="40,40,0,0" TextWrapping="Wrap" Text="25" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="SpielfeldY" TextChanged="SpielfeldY_OnChanged" HorizontalAlignment="Right" Height="20" Margin="0,40,40,0" TextWrapping="Wrap" Text="25" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="x" VerticalAlignment="Top" Margin="0,40,0,0"/>
+            <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Text="Bevölkerungsgröße" VerticalAlignment="Top" Height="20" TextDecorations="Underline" FontStyle="Italic"/>
+        </Grid>
+        <Grid HorizontalAlignment="Center" Margin="800,0,0,200" Background="Silver" VerticalAlignment="Center" Height="115" Width="200">
+            <Button HorizontalAlignment="Center" Margin="0,35,0,0" VerticalAlignment="Top" x:Name="StartBtn" Content="Generationswechsel Starten" Click="ButtonStart_Click" Width="175" Height="20"/>
+            <Button HorizontalAlignment="Center" Margin="0,85,0,0" VerticalAlignment="Top" x:Name="NeuBtn" Content="Bevölkerung Töten" Click="ButtonNeu_Click" Height="20" Width="175"/>
+            <Button HorizontalAlignment="Center" Margin="0,60,0,0" VerticalAlignment="Top" x:Name="SchrittBtn" Content="Nächster Generationswechsel" Width="175" Click="ButtonSchritt_Click" Height="20"/>
+            <Button HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" x:Name="ZufallBtn" Content="Zufällige Bevölkerung"  Width="175" Click="ButtonZufall_Click" Height="20"/>
+        </Grid>
+        <Grid HorizontalAlignment="Center" Margin="800,150,0,0" Background="Silver" VerticalAlignment="Center" Height="175" Width="200">
+            <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top" Margin="20,20,0,0" Height="20" Width="55" x:Name="TimerTxt2">---</TextBlock>
+            <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Text="Läuft seit:" VerticalAlignment="Top" Height="20" Width="175" FontSize="14" x:Name="TimerTxt"/>
+            <TextBlock HorizontalAlignment="Center" Margin="12.5,45,12.5,0" TextWrapping="Wrap" Text="Lebende (Schwarz):" VerticalAlignment="Top" Height="20" Width="175" FontSize="14"/>
+            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,55,10,0" Height="20" Width="45" Text="0"/>
+            <TextBlock HorizontalAlignment="Center" Margin="12.5,80,12.5,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Width="175" FontSize="14" Text="Tote (Weiß):" />
+            <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top" Margin="40,90,0,0" Height="20" Width="45" Text="0"/>
         </Grid>
         <Border 
             BorderThickness="7"
             
             BorderBrush="Gray"
             Background="LightGray"
-            Margin="43,37,203,43"
-            x:Name="SpielfeldRahmen"
+            Margin="0,0,250,0"
+            x:Name="SpielfeldRahmen" Width="750" Height="750" HorizontalAlignment="Center" VerticalAlignment="Center"
         >
             <Canvas x:Name="Spielfeld" ClipToBounds="True" />
         </Border>

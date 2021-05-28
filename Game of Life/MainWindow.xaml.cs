@@ -15,9 +15,10 @@ namespace Game_of_Life
     /// </summary>
     public partial class MainWindow : Window
     {
-        const int breiteViereck = 25;
-        const int hoeheViereck = 25;
-        Rectangle[,] zellen = new Rectangle[breiteViereck, hoeheViereck];
+        bool init = true;
+        int breiteViereck = 25;
+        int hoeheViereck = 25;
+        Rectangle[,] zellen = new Rectangle[25, 25];
         bool SBtnZustand = false;
         Stopwatch timer = new Stopwatch();
         Random rand = new Random();
@@ -34,6 +35,8 @@ namespace Game_of_Life
         {
             erstelleSpielfeld();
         }
+
+        
 
         /// <summary>
         /// Erstellt das Spielfeld
@@ -63,8 +66,16 @@ namespace Game_of_Life
                     zellen[i, j] = r;
                 }
             }
+            if (init) { init = false; }
         }
-        
+
+        private void aenderSpielfeld()
+        {
+            Spielfeld.Children.Clear();
+            zellen = new Rectangle[breiteViereck, hoeheViereck];
+            erstelleSpielfeld();
+        }
+
         /// <summary>
         /// Ändert die Farbe einer Zelle nur wenn der Benutzer die linke Maustaste gedrückt hält und eine Zelle betritt
         /// </summary>
@@ -98,7 +109,7 @@ namespace Game_of_Life
             if (!SBtnZustand)
             {
                 SBtnZustand = true;
-                StartBtn.Content = "Stoppen"; // Setzt den Btn Text auf Stoppen
+                StartBtn.Content = "Generationswechsel Anhalten"; // Setzt den Btn Text auf Stoppen
 
                 TimerTxt.Visibility = Visibility.Visible;
                 TimerTxt2.Visibility = Visibility.Visible;
@@ -122,7 +133,7 @@ namespace Game_of_Life
                 ZufallBtn.IsEnabled = true;
                 NeuBtn.IsEnabled = true;
                 SchrittBtn.IsEnabled = true;
-                StartBtn.Content = "Fortsetzen"; // Setzt den Btn Text auf Starten
+                StartBtn.Content = "Generationswechsel Fortsetzen"; // Setzt den Btn Text auf Starten
                 return;
             }
         }
@@ -200,9 +211,8 @@ namespace Game_of_Life
             Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = Brushes.White);
             SBtnZustand = false;
             timer.Reset();
-            TimerTxt.Visibility = Visibility.Hidden;
-            TimerTxt2.Visibility = Visibility.Hidden;
-            StartBtn.Content = "Starten";
+            TimerTxt2.Text = "---";
+            StartBtn.Content = "Generationswechsel Starten";
         }
 
         //Erstellt zufällig belebte/tote Zellen
@@ -210,8 +220,8 @@ namespace Game_of_Life
         {
             Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = brushes[rand.Next(brushes.Length)]);
             timer.Reset();
-            TimerTxt.Visibility = Visibility.Hidden;
-            TimerTxt2.Visibility = Visibility.Hidden;
+            TimerTxt2.Text = "---";
+            StartBtn.Content = "Generationswechsel Starten";
         }
 
         /// <summary>
@@ -232,6 +242,25 @@ namespace Game_of_Life
         private void ButtonHilfe_Click(object sender, RoutedEventArgs eventArgs)
         {
             MessageBox.Show("Willkommen zum Game of Life.\r\n\r\nEin Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist eine Zelle, welche einen von zwei Zuständen besitzen kann: tot (weiß) oder lebendig (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Zellen auf dem Spielfeld platziert. (Maustaste betätigen)\r\n\r\nDer „Zufall“ -Button ermöglich eine Generation von zufällig belebten oder toten Zellen.\r\n\r\nMit einem Mausklick auf die „Starten“-Taste kann nun das Spiel beginnen.\r\n\r\nJede lebende oder tote Zelle hat auf diesem Spielfeld genau acht Nachbarzellen, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Eine tote Zelle mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Zellen mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Zellen mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
+        }
+
+        private void SpielfeldX_OnChanged(object sender, TextChangedEventArgs e)
+        {
+            if (SpielfeldX.Text != "" && !init)
+            {
+                hoeheViereck = int.Parse(SpielfeldX.Text);
+                aenderSpielfeld();
+            }
+
+        }
+
+        private void SpielfeldY_OnChanged(object sender, TextChangedEventArgs e)
+        {
+            if (SpielfeldY.Text != "" && !init)
+            {
+               breiteViereck = int.Parse(SpielfeldX.Text);
+               aenderSpielfeld();
+            }
         }
     }
 }
