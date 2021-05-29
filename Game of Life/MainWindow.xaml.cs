@@ -15,6 +15,8 @@ namespace Game_of_Life
     /// </summary>
     public partial class MainWindow : Window
     {
+        int tod = 100;
+        int lebend = 0;
         bool init = true;
         int breiteViereck = 25;
         int hoeheViereck = 25;
@@ -36,7 +38,6 @@ namespace Game_of_Life
             erstelleSpielfeld();
         }
 
-        
 
         /// <summary>
         /// Erstellt das Spielfeld
@@ -69,12 +70,47 @@ namespace Game_of_Life
             if (init) { init = false; }
         }
 
-        private void aenderSpielfeld()
+
+        private void aenderSpielfeld(object sender, TextChangedEventArgs e)
         {
-            Spielfeld.Children.Clear();
-            zellen = new Rectangle[breiteViereck, hoeheViereck];
-            erstelleSpielfeld();
+            if (!init)
+            {
+
+                try
+                {
+                    SpielfeldY.Text = SpielfeldX.Text;
+
+                    if (SpielfeldX.Text != "" && SpielfeldY.Text != "")
+                    {
+                        hoeheViereck = int.Parse(SpielfeldX.Text);
+                        breiteViereck = int.Parse(SpielfeldX.Text);
+                        Spielfeld.Children.Clear();
+
+                        zellen = new Rectangle[breiteViereck, hoeheViereck];
+                        tod = hoeheViereck * breiteViereck;
+                        erstelleSpielfeld();
+                    }
+                }
+                catch (Exception)
+                {
+                    try
+                    {
+                        int CursorIndex = SpielfeldX.SelectionStart - 1;
+                        SpielfeldX.Text = SpielfeldX.Text.Remove(CursorIndex, 1);
+
+                        //Align Cursor to same index
+                        SpielfeldX.SelectionStart = CursorIndex;
+                        SpielfeldX.SelectionLength = 0;
+
+                        SpielfeldY.Text = SpielfeldX.Text;
+                    }
+                    catch (Exception) { }
+                }
+            }
         }
+
+        
+
 
         /// <summary>
         /// Ändert die Farbe einer Zelle nur wenn der Benutzer die linke Maustaste gedrückt hält und eine Zelle betritt
@@ -110,7 +146,7 @@ namespace Game_of_Life
             {
                 SBtnZustand = true;
                 StartBtn.Content = "Generationswechsel Anhalten"; // Setzt den Btn Text auf Stoppen
-
+                SpielfeldX.IsEnabled = false;
                 TimerTxt.Visibility = Visibility.Visible;
                 TimerTxt2.Visibility = Visibility.Visible;
                 ZufallBtn.IsEnabled = false;
@@ -120,6 +156,8 @@ namespace Game_of_Life
                 while (SBtnZustand) {
                     GenerationsWechsel();
                     timerzeit = timer.Elapsed.ToString();
+                    weiss.Text = tod.ToString();
+                    schwarz.Text = lebend.ToString();
                     TimerTxt2.Text = timerzeit.Substring(0, timerzeit.Length -8);
                     await Task.Delay(250);
                     
@@ -130,6 +168,7 @@ namespace Game_of_Life
             {
                 SBtnZustand = false;
                 timer.Stop();
+                SpielfeldX.IsEnabled = true;
                 ZufallBtn.IsEnabled = true;
                 NeuBtn.IsEnabled = true;
                 SchrittBtn.IsEnabled = true;
@@ -138,17 +177,17 @@ namespace Game_of_Life
             }
         }
 
-        
-
 
         private void GenerationsWechsel()
         {
             int[,] anzahlNachbarn = new int[breiteViereck, hoeheViereck];
+            int[,] lebenzeichen = new int[breiteViereck, hoeheViereck];
 
             for (int i = 0; i < breiteViereck; i++)
             {
                 for (int j = 0; j < hoeheViereck; j++)
                 {
+                    int zeichen = 0;
                     int nachbarn = 0;
                     int obenTorus = i - 1;
                     int untenTorus = i + 1;
@@ -179,15 +218,31 @@ namespace Game_of_Life
                     { nachbarn++; }
                     if (zellen[untenTorus, rechtsTorus].Fill == Brushes.Black)
                     { nachbarn++; }
+                    if (zellen[i, j].Fill == Brushes.Black)
+                    { zeichen++; }
+
 
                     anzahlNachbarn[i, j] = nachbarn;
 
+                    lebenzeichen[i, j] = zeichen;
+                    Console.WriteLine("i: " + i + ", j: " + j + ", zeichen: " + zeichen);
                 }
             }
             for (int i = 0; i < breiteViereck; i++)
             {
                 for (int j = 0; j < hoeheViereck; j++)
                 {
+                    if(lebenzeichen[i, j] == 1)
+                    {
+                        lebend++;
+                        tod--;
+                    }
+                    else if (lebenzeichen[i, j] == 0)
+                    {
+                        lebend--;
+                        tod++;
+                    }
+
                     if (anzahlNachbarn[i, j] < 2 || anzahlNachbarn[i, j] > 3)
                     {
                         zellen[i, j].Fill = Brushes.White;
@@ -244,23 +299,5 @@ namespace Game_of_Life
             MessageBox.Show("Willkommen zum Game of Life.\r\n\r\nEin Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist eine Zelle, welche einen von zwei Zuständen besitzen kann: tot (weiß) oder lebendig (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Zellen auf dem Spielfeld platziert. (Maustaste betätigen)\r\n\r\nDer „Zufall“ -Button ermöglich eine Generation von zufällig belebten oder toten Zellen.\r\n\r\nMit einem Mausklick auf die „Starten“-Taste kann nun das Spiel beginnen.\r\n\r\nJede lebende oder tote Zelle hat auf diesem Spielfeld genau acht Nachbarzellen, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Eine tote Zelle mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Zellen mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Zellen mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
         }
 
-        private void SpielfeldX_OnChanged(object sender, TextChangedEventArgs e)
-        {
-            if (SpielfeldX.Text != "" && !init)
-            {
-                hoeheViereck = int.Parse(SpielfeldX.Text);
-                aenderSpielfeld();
-            }
-
-        }
-
-        private void SpielfeldY_OnChanged(object sender, TextChangedEventArgs e)
-        {
-            if (SpielfeldY.Text != "" && !init)
-            {
-               breiteViereck = int.Parse(SpielfeldX.Text);
-               aenderSpielfeld();
-            }
-        }
     }
 }
