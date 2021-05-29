@@ -182,7 +182,8 @@ namespace Game_of_Life
         {
             int[,] anzahlNachbarn = new int[breiteViereck, hoeheViereck];
             int[,] lebenzeichen = new int[breiteViereck, hoeheViereck];
-
+            int s = 0;
+            int w = 0;
             for (int i = 0; i < breiteViereck; i++)
             {
                 for (int j = 0; j < hoeheViereck; j++)
@@ -218,6 +219,7 @@ namespace Game_of_Life
                     { nachbarn++; }
                     if (zellen[untenTorus, rechtsTorus].Fill == Brushes.Black)
                     { nachbarn++; }
+                    
                     if (zellen[i, j].Fill == Brushes.Black)
                     { zeichen++; }
 
@@ -228,19 +230,19 @@ namespace Game_of_Life
                     Console.WriteLine("i: " + i + ", j: " + j + ", zeichen: " + zeichen);
                 }
             }
+
             for (int i = 0; i < breiteViereck; i++)
             {
                 for (int j = 0; j < hoeheViereck; j++)
                 {
                     if(lebenzeichen[i, j] == 1)
                     {
-                        lebend++;
-                        tod--;
+                        s++;
+                        
                     }
                     else if (lebenzeichen[i, j] == 0)
                     {
-                        lebend--;
-                        tod++;
+                        w++;
                     }
 
                     if (anzahlNachbarn[i, j] < 2 || anzahlNachbarn[i, j] > 3)
@@ -253,6 +255,8 @@ namespace Game_of_Life
                     }
                 }
             }
+            lebend = s;
+            tod = w;
         }
 
 
