@@ -169,7 +169,6 @@ namespace Game_of_Life
                     await Task.Delay(GenerationsZyklus);
                     
                 }
-                
             }
             else
             {
@@ -194,12 +193,10 @@ namespace Game_of_Life
             int[,] lebenzeichen = new int[breiteViereck, hoeheViereck];
             int s = 0;
             int w = 0;
-            int endlossZaehler = 0;
             for (int i = 0; i < breiteViereck; i++)
             {
                 for (int j = 0; j < hoeheViereck; j++)
                 {
-                    int zeichen = 0;
                     int nachbarn = 0;
                     int obenTorus = i - 1;
                     int untenTorus = i + 1;
@@ -231,14 +228,8 @@ namespace Game_of_Life
                     if (zellen[untenTorus, rechtsTorus].Fill == Brushes.Black)
                     { nachbarn++; }
                     
-                    if (zellen[i, j].Fill == Brushes.Black)
-                    { zeichen++; }
-
-
                     anzahlNachbarn[i, j] = nachbarn;
 
-                    lebenzeichen[i, j] = zeichen;
-                    //Console.WriteLine("i: " + i + ", j: " + j + ", zeichen: " + zeichen);
                 }
             }
 
@@ -246,16 +237,6 @@ namespace Game_of_Life
             {
                 for (int j = 0; j < hoeheViereck; j++)
                 {
-                    if(lebenzeichen[i, j] == 1)
-                    {
-                        s++;
-                        
-                    }
-                    else if (lebenzeichen[i, j] == 0)
-                    {
-                        w++;
-                    }
-
                     if (anzahlNachbarn[i, j] < 2 || anzahlNachbarn[i, j] > 3)
                     {
                         zellen[i, j].Fill = Brushes.White;
@@ -267,90 +248,7 @@ namespace Game_of_Life
                 }
             }
 
-            int differenzLebend = s - lebend;
-            int differenzTote = w - tod;
-
-
-            lebend = s;
-            tod = w;
-
-            
-
-            if (differenzLebend < 0)
-            {
-                differenzAnzeigeLebend.Foreground = Brushes.Red;
-                differenzAnzeigeLebend.Text = "-";
-            }
-            else if (differenzLebend > 0)
-            {
-                differenzAnzeigeLebend.Foreground = Brushes.Green;
-                differenzAnzeigeLebend.Text = "+";
-                if (differenzAnzeige.Text == differenzLebend.ToString())
-                {
-                    endlossZaehler++;
-                    Console.WriteLine(endlossZaehler);
-                }
-                else if(differenzAnzeige.Text != differenzLebend.ToString())
-                {
-                    endlossZaehler = 0;
-                    Console.WriteLine(endlossZaehler);
-                }
-
-                differenzAnzeige.Text = differenzLebend.ToString();
-                
-            }
-            else if (differenzLebend == 0)
-            {
-                differenzAnzeigeLebend.Foreground = Brushes.Black;
-                differenzAnzeigeLebend.Text = "+/-";
-            }
-
-            if (differenzTote < 0)
-            {
-                differenzAnzeigeTod.Foreground = Brushes.Red;
-                differenzAnzeigeTod.Text = "-";
-            }
-            else if (differenzTote > 0)
-            {
-                differenzAnzeigeTod.Foreground = Brushes.Green;
-                differenzAnzeigeTod.Text = "+";
-                if (differenzAnzeige.Text == differenzTote.ToString())
-                {
-                    endlossZaehler++;
-                    Console.WriteLine(endlossZaehler);
-                }
-                else if (differenzAnzeige.Text != differenzTote.ToString())
-                {
-                    endlossZaehler = 0;
-                    Console.WriteLine(endlossZaehler);
-                }
-                differenzAnzeige.Text = differenzTote.ToString();
-            }
-            else if (differenzTote == 0)
-            {
-                differenzAnzeigeTod.Foreground = Brushes.Black;
-                differenzAnzeigeTod.Text = "+/-";
-            }
-
-            weiss.Text = w.ToString();
-            schwarz.Text = s.ToString();
-            //Console.WriteLine(endlossZaehler);
-            if (tod == hoeheViereck * breiteViereck || endlossZaehler == 3)
-            {
-                SBtnZustand = false;
-                timer.Stop();
-                Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = Brushes.White);
-                differenzAnzeigeLebend.Visibility = Visibility.Hidden;
-                differenzAnzeigeTod.Visibility = Visibility.Hidden;
-                differenzAnzeige.Visibility = Visibility.Hidden;
-                SpielfeldX.IsEnabled = true;
-                ZufallBtn.IsEnabled = true;
-                NeuBtn.IsEnabled = true;
-                SchrittBtn.IsEnabled = true;
-                StartBtn.Content = "Generationswechsel Starten"; // Setzt den Btn Text auf Starten
-                return;
-            }
-
+            todLebenAnzeige();
         }
 
         private void todLebenAnzeige()
@@ -380,6 +278,47 @@ namespace Game_of_Life
 
             weiss.Text = w.ToString();
             schwarz.Text = s.ToString();
+
+            int differenzLebend = s - lebend;
+            int differenzTote = w - tod;
+
+            if (differenzLebend < 0)
+            {
+                differenzAnzeigeLebend.Foreground = Brushes.Red;
+                differenzAnzeigeLebend.Text = "-";
+            }
+            else if (differenzLebend > 0)
+            {
+                differenzAnzeigeLebend.Foreground = Brushes.Green;
+                differenzAnzeigeLebend.Text = "+";
+                differenzAnzeige.Text = differenzLebend.ToString();
+            }
+            else if (differenzLebend == 0)
+            {
+                differenzAnzeigeLebend.Foreground = Brushes.Black;
+                differenzAnzeigeLebend.Text = "+/-";
+            }
+
+            if (differenzTote < 0)
+            {
+                differenzAnzeigeTod.Foreground = Brushes.Red;
+                differenzAnzeigeTod.Text = "-";
+            }
+            else if (differenzTote > 0)
+            {
+                differenzAnzeigeTod.Foreground = Brushes.Green;
+                differenzAnzeigeTod.Text = "+";
+                differenzAnzeige.Text = differenzTote.ToString();
+            }
+            else if (differenzTote == 0)
+            {
+                differenzAnzeigeTod.Foreground = Brushes.Black;
+                differenzAnzeigeTod.Text = "+/-";
+            }
+
+            lebend = s;
+            tod = w;
+
         }
 
 
