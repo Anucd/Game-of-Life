@@ -15,7 +15,7 @@ namespace Game_of_Life
     /// </summary>
     public partial class MainWindow : Window
     {
-        int tod = 100;
+        int tod = 625;
         int lebend = 0;
         bool init = true;
         int breiteViereck = 25;
@@ -147,8 +147,8 @@ namespace Game_of_Life
                 SBtnZustand = true;
                 StartBtn.Content = "Generationswechsel Anhalten"; // Setzt den Btn Text auf Stoppen
                 SpielfeldX.IsEnabled = false;
-                TimerTxt.Visibility = Visibility.Visible;
-                TimerTxt2.Visibility = Visibility.Visible;
+                differenzAnzeigeLebend.Visibility = Visibility.Visible;
+                differenzAnzeigeTod.Visibility = Visibility.Visible;
                 ZufallBtn.IsEnabled = false;
                 NeuBtn.IsEnabled = false;
                 SchrittBtn.IsEnabled = false;
@@ -156,10 +156,8 @@ namespace Game_of_Life
                 while (SBtnZustand) {
                     GenerationsWechsel();
                     timerzeit = timer.Elapsed.ToString();
-                    weiss.Text = tod.ToString();
-                    schwarz.Text = lebend.ToString();
                     TimerTxt2.Text = timerzeit.Substring(0, timerzeit.Length -8);
-                    await Task.Delay(250);
+                    await Task.Delay(500);
                     
                 }
                 
@@ -255,8 +253,44 @@ namespace Game_of_Life
                     }
                 }
             }
+
+            int differenzLebend = s - lebend;
+            int differenzTote = w - tod;
+
+
             lebend = s;
             tod = w;
+            differenzAnzeigeLebend.Text = differenzLebend.ToString();
+            differenzAnzeigeTod.Text = differenzTote.ToString();
+
+            if(differenzLebend < 0)
+            {
+                differenzAnzeigeLebend.Foreground = Brushes.Red;
+            }
+            else if (differenzLebend > 0)
+            {
+                differenzAnzeigeLebend.Foreground = Brushes.Green;
+            }
+            else if (differenzLebend == 0)
+            {
+                differenzAnzeigeLebend.Foreground = Brushes.Black;
+            }
+
+            if (differenzTote < 0)
+            {
+                differenzAnzeigeTod.Foreground = Brushes.Red;
+            }
+            else if (differenzTote > 0)
+            {
+                differenzAnzeigeTod.Foreground = Brushes.Green;
+            }
+            else if (differenzTote == 0)
+            {
+                differenzAnzeigeTod.Foreground = Brushes.Black;
+            }
+
+            weiss.Text = w.ToString();
+            schwarz.Text = s.ToString();
         }
 
 
@@ -300,7 +334,7 @@ namespace Game_of_Life
         /// <param name="eventArgs"></param>
         private void ButtonHilfe_Click(object sender, RoutedEventArgs eventArgs)
         {
-            MessageBox.Show("Willkommen zum Game of Life.\r\n\r\nEin Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist eine Zelle, welche einen von zwei Zuständen besitzen kann: tot (weiß) oder lebendig (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Zellen auf dem Spielfeld platziert. (Maustaste betätigen)\r\n\r\nDer „Zufall“ -Button ermöglich eine Generation von zufällig belebten oder toten Zellen.\r\n\r\nMit einem Mausklick auf die „Starten“-Taste kann nun das Spiel beginnen.\r\n\r\nJede lebende oder tote Zelle hat auf diesem Spielfeld genau acht Nachbarzellen, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Eine tote Zelle mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Zellen mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Zellen mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
+            MessageBox.Show("Willkommen zum Game of Life.\r\n\r\nEin Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist ein Bewohner, welcher einen von zwei Zuständen besitzen kann: tot (weiß) oder lebend (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Bewohnern auf dem Spielfeld platziert indem man mit der Maus über das Spielfeld fährt und dabei die Maustaste drückt.\r\n\r\nDer „Zufällige Bevölkerung“ -Button ermöglich eine Generation von zufällig belebten oder toten Bewohnern.\r\n\r\nMit einem Mausklick auf den „Generationswechsel starten“-Button kann nun das Spiel beginnen.\r\n\r\nJeder lebende oder tot Bewohner hat auf diesem Spielfeld genau acht Nachbarn, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Ein toter Bewohner mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Bewohner mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Bewohner mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
         }
 
     }
