@@ -20,6 +20,7 @@ namespace Game_of_Life
         bool init = true;
         int breiteViereck = 25;
         int hoeheViereck = 25;
+        int GenerationsZyklus = 250;
         Rectangle[,] zellen = new Rectangle[25, 25];
         bool SBtnZustand = false;
         Stopwatch timer = new Stopwatch();
@@ -122,6 +123,7 @@ namespace Game_of_Life
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 ((Rectangle)sender).Fill = ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
+                todLebenAnzeige();
             }
         }
 
@@ -133,12 +135,18 @@ namespace Game_of_Life
         private void R_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ((Rectangle)sender).Fill = (((Rectangle)sender).Fill == Brushes.White) ? Brushes.Black : Brushes.White;
+            todLebenAnzeige();
         }
         /// <summary>
         /// Startet/Stoppt das Game of Life
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        
+        private void GenerationsZyklusAendern(object sender, RoutedPropertyChangedEventArgs<double> e) {
+            GenerationsZyklus = Convert.ToInt32(zyklusSlider.Value);
+        }
+
         private async void ButtonStart_Click(object sender, RoutedEventArgs e)
         {
             string timerzeit = "";
@@ -149,6 +157,7 @@ namespace Game_of_Life
                 SpielfeldX.IsEnabled = false;
                 differenzAnzeigeLebend.Visibility = Visibility.Visible;
                 differenzAnzeigeTod.Visibility = Visibility.Visible;
+                differenzAnzeige.Visibility = Visibility.Visible;
                 ZufallBtn.IsEnabled = false;
                 NeuBtn.IsEnabled = false;
                 SchrittBtn.IsEnabled = false;
@@ -157,7 +166,7 @@ namespace Game_of_Life
                     GenerationsWechsel();
                     timerzeit = timer.Elapsed.ToString();
                     TimerTxt2.Text = timerzeit.Substring(0, timerzeit.Length -8);
-                    await Task.Delay(500);
+                    await Task.Delay(GenerationsZyklus);
                     
                 }
                 
@@ -166,6 +175,9 @@ namespace Game_of_Life
             {
                 SBtnZustand = false;
                 timer.Stop();
+                differenzAnzeigeLebend.Visibility = Visibility.Hidden;
+                differenzAnzeigeTod.Visibility = Visibility.Hidden;
+                differenzAnzeige.Visibility = Visibility.Hidden;
                 SpielfeldX.IsEnabled = true;
                 ZufallBtn.IsEnabled = true;
                 NeuBtn.IsEnabled = true;
@@ -182,6 +194,7 @@ namespace Game_of_Life
             int[,] lebenzeichen = new int[breiteViereck, hoeheViereck];
             int s = 0;
             int w = 0;
+            int endlossZaehler = 0;
             for (int i = 0; i < breiteViereck; i++)
             {
                 for (int j = 0; j < hoeheViereck; j++)
@@ -225,7 +238,7 @@ namespace Game_of_Life
                     anzahlNachbarn[i, j] = nachbarn;
 
                     lebenzeichen[i, j] = zeichen;
-                    Console.WriteLine("i: " + i + ", j: " + j + ", zeichen: " + zeichen);
+                    //Console.WriteLine("i: " + i + ", j: " + j + ", zeichen: " + zeichen);
                 }
             }
 
@@ -260,33 +273,109 @@ namespace Game_of_Life
 
             lebend = s;
             tod = w;
-            differenzAnzeigeLebend.Text = differenzLebend.ToString();
-            differenzAnzeigeTod.Text = differenzTote.ToString();
 
-            if(differenzLebend < 0)
+            
+
+            if (differenzLebend < 0)
             {
                 differenzAnzeigeLebend.Foreground = Brushes.Red;
+                differenzAnzeigeLebend.Text = "-";
             }
             else if (differenzLebend > 0)
             {
                 differenzAnzeigeLebend.Foreground = Brushes.Green;
+                differenzAnzeigeLebend.Text = "+";
+                if (differenzAnzeige.Text == differenzLebend.ToString())
+                {
+                    endlossZaehler++;
+                    Console.WriteLine(endlossZaehler);
+                }
+                else if(differenzAnzeige.Text != differenzLebend.ToString())
+                {
+                    endlossZaehler = 0;
+                    Console.WriteLine(endlossZaehler);
+                }
+
+                differenzAnzeige.Text = differenzLebend.ToString();
+                
             }
             else if (differenzLebend == 0)
             {
                 differenzAnzeigeLebend.Foreground = Brushes.Black;
+                differenzAnzeigeLebend.Text = "+/-";
             }
 
             if (differenzTote < 0)
             {
                 differenzAnzeigeTod.Foreground = Brushes.Red;
+                differenzAnzeigeTod.Text = "-";
             }
             else if (differenzTote > 0)
             {
                 differenzAnzeigeTod.Foreground = Brushes.Green;
+                differenzAnzeigeTod.Text = "+";
+                if (differenzAnzeige.Text == differenzTote.ToString())
+                {
+                    endlossZaehler++;
+                    Console.WriteLine(endlossZaehler);
+                }
+                else if (differenzAnzeige.Text != differenzTote.ToString())
+                {
+                    endlossZaehler = 0;
+                    Console.WriteLine(endlossZaehler);
+                }
+                differenzAnzeige.Text = differenzTote.ToString();
             }
             else if (differenzTote == 0)
             {
                 differenzAnzeigeTod.Foreground = Brushes.Black;
+                differenzAnzeigeTod.Text = "+/-";
+            }
+
+            weiss.Text = w.ToString();
+            schwarz.Text = s.ToString();
+            //Console.WriteLine(endlossZaehler);
+            if (tod == hoeheViereck * breiteViereck || endlossZaehler == 3)
+            {
+                SBtnZustand = false;
+                timer.Stop();
+                Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = Brushes.White);
+                differenzAnzeigeLebend.Visibility = Visibility.Hidden;
+                differenzAnzeigeTod.Visibility = Visibility.Hidden;
+                differenzAnzeige.Visibility = Visibility.Hidden;
+                SpielfeldX.IsEnabled = true;
+                ZufallBtn.IsEnabled = true;
+                NeuBtn.IsEnabled = true;
+                SchrittBtn.IsEnabled = true;
+                StartBtn.Content = "Generationswechsel Starten"; // Setzt den Btn Text auf Starten
+                return;
+            }
+
+        }
+
+        private void todLebenAnzeige()
+        {
+            int s = 0;
+            int w = 0;
+            for (int i = 0; i < breiteViereck; i++)
+            {
+                for (int j = 0; j < hoeheViereck; j++)
+                {
+                    int lebenszeichen = 0;
+                    
+                    if (zellen[i, j].Fill == Brushes.Black)
+                    { lebenszeichen++; }
+
+                    if (lebenszeichen == 1)
+                    {
+                        s++;
+
+                    }
+                    else if (lebenszeichen == 0)
+                    {
+                        w++;
+                    }
+                }
             }
 
             weiss.Text = w.ToString();
@@ -305,6 +394,8 @@ namespace Game_of_Life
             SBtnZustand = false;
             timer.Reset();
             TimerTxt2.Text = "---";
+            schwarz.Text = "0";
+            weiss.Text = (hoeheViereck*breiteViereck).ToString();
             StartBtn.Content = "Generationswechsel Starten";
         }
 
@@ -314,6 +405,7 @@ namespace Game_of_Life
             Spielfeld.Children.OfType<Rectangle>().ToList().ForEach(x => x.Fill = brushes[rand.Next(brushes.Length)]);
             timer.Reset();
             TimerTxt2.Text = "---";
+            todLebenAnzeige();
             StartBtn.Content = "Generationswechsel Starten";
         }
 
@@ -334,7 +426,7 @@ namespace Game_of_Life
         /// <param name="eventArgs"></param>
         private void ButtonHilfe_Click(object sender, RoutedEventArgs eventArgs)
         {
-            MessageBox.Show("Willkommen zum Game of Life.\r\n\r\nEin Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist ein Bewohner, welcher einen von zwei Zuständen besitzen kann: tot (weiß) oder lebend (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Bewohnern auf dem Spielfeld platziert indem man mit der Maus über das Spielfeld fährt und dabei die Maustaste drückt.\r\n\r\nDer „Zufällige Bevölkerung“ -Button ermöglich eine Generation von zufällig belebten oder toten Bewohnern.\r\n\r\nMit einem Mausklick auf den „Generationswechsel starten“-Button kann nun das Spiel beginnen.\r\n\r\nJeder lebende oder tot Bewohner hat auf diesem Spielfeld genau acht Nachbarn, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Ein toter Bewohner mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Bewohner mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Bewohner mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung");
+            MessageBox.Show("Willkommen zum Game of Life.\r\n\r\nEin Spielfeld wird in Zeilen und Spalten unterteilt. Jedes Gitterquadrat ist ein Bewohner, welcher einen von zwei Zuständen besitzen kann: tot (weiß) oder lebend (schwarz).\r\n\r\nZunächst wird eine Anfangsgeneration von lebenden Bewohnern auf dem Spielfeld platziert indem man mit der Maus auf ein Gitterquadrat klickt.\r\nDurch das Halten der Maustaste kann die Auswahl der Anfangsgeneration beschleunigt werden.\r\n\r\nDer „Zufällige Bevölkerung“-Button ermöglicht ein zufällig generiertes Spielfeld von lebenden und toten Bewohnern.\r\n\r\nWenn man auf den Button „Nächster Generationswechsel“ klickt, kann man einen schrittweisen Spielablauf verfolgen.\r\n\r\nMit einem Mausklick auf den „Generationswechsel Starten“-Button kann das Spiel beginnen.\r\n\r\nJeder lebende und tote Bewohner hat auf diesem Spielfeld genau acht Nachbarn, die berücksichtigt werden. Die nächste Generation ergibt sich durch die Befolgung einfacher Regeln:\r\n\r\n•Ein toter Bewohner mit genau drei lebenden Nachbarn wird in der Folgegeneration neu geboren.\r\n\r\n•Lebende Bewohner mit weniger als zwei lebenden Nachbarn sterben in der Folgegeneration an Einsamkeit.\r\n\r\n•Lebende Bewohner mit mehr als drei lebenden Nachbarn sterben in der Folgegeneration an Überbevölkerung.");
         }
 
     }

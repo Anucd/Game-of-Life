@@ -9,12 +9,18 @@
         MinHeight="900" MinWidth="1200" MaxHeight="1080" MaxWidth="1920" SizeToContent="WidthAndHeight">
 
     <Grid>
-        <Grid HorizontalAlignment="Center" Margin="800,0,0,415" Background="Silver" VerticalAlignment="Center" Height="75" Width="200">
+        <Grid HorizontalAlignment="Center" Margin="800,0,0,590" Background="Silver" VerticalAlignment="Center" Height="75" Width="200">
             <Button HorizontalAlignment="Right" Margin="0,7.5,7.5,0" VerticalAlignment="Top" x:Name="HilfeBtn" Content="?"  Width="20" Click="ButtonHilfe_Click" Height="20" UseLayoutRounding="False"/>
             <TextBox x:Name="SpielfeldX" TextChanged="aenderSpielfeld" HorizontalAlignment="Left" Height="20" Margin="40,40,0,0" TextWrapping="Wrap" Text="25" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
             <TextBox x:Name="SpielfeldY" IsEnabled="False" HorizontalAlignment="Right" Height="20" Margin="0,40,40,0" TextWrapping="Wrap" Text="25" VerticalAlignment="Top" Width="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
             <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="x" VerticalAlignment="Top" Margin="0,40,0,0"/>
             <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Text="Bevölkerungsgröße" VerticalAlignment="Top" Height="20" TextDecorations="Underline" FontStyle="Italic"/>
+        </Grid>
+        <Grid HorizontalAlignment="Center" Margin="800,0,0,415" Background="Silver" VerticalAlignment="Center" Height="75" Width="200">
+            <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Text="Generationslebenszyklus" VerticalAlignment="Top" Height="20" TextDecorations="Underline" FontStyle="Italic"/>
+            <Slider x:Name="zyklusSlider" ValueChanged="GenerationsZyklusAendern" Margin="0,35,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Center" Width="175" Maximum="2500" Value="250" SmallChange="1" Minimum="10"/>
+            <TextBlock HorizontalAlignment="Left" Margin="5,0,0,5" TextWrapping="Wrap" Text="Schnell" VerticalAlignment="Bottom"/>
+            <TextBlock HorizontalAlignment="Right" Margin="0,0,5,5" TextWrapping="Wrap" Text="Langsam" VerticalAlignment="Bottom"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Margin="800,0,0,200" Background="Silver" VerticalAlignment="Center" Height="115" Width="200">
             <Button HorizontalAlignment="Center" Margin="0,35,0,0" VerticalAlignment="Top" x:Name="StartBtn" Content="Generationswechsel Starten" Click="ButtonStart_Click" Width="175" Height="20"/>
@@ -23,14 +29,15 @@
             <Button HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" x:Name="ZufallBtn" Content="Zufällige Bevölkerung"  Width="175" Click="ButtonZufall_Click" Height="20"/>
         </Grid>
         <Grid HorizontalAlignment="Center" Margin="800,150,0,0" Background="Silver" VerticalAlignment="Center" Height="175" Width="200">
-            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Margin="20,20,2,0" Height="20" Width="55" x:Name="TimerTxt2">---</TextBlock>
+            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Margin="20,20,7,0" Height="20" Width="55" x:Name="TimerTxt2">---</TextBlock>
             <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Text="Läuft seit:" VerticalAlignment="Top" Height="20" Width="175" FontSize="14" x:Name="TimerTxt"/>
             <TextBlock HorizontalAlignment="Center" Margin="12.5,45,12.5,0" TextWrapping="Wrap" Text="Lebende (Schwarz):" VerticalAlignment="Top" Height="20" Width="175" FontSize="14"/>
-            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,55,30,0" Height="20" Width="30" x:Name="schwarz" Text="0"/>
+            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,55,35,0" Height="20" Width="30" x:Name="schwarz" Text="0"/>
             <TextBlock HorizontalAlignment="Center" Margin="12.5,80,12.5,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Width="175" FontSize="14" Text="Tote (Weiß):" />
-            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,90,30,0" Height="20" Width="30" x:Name="weiss" Text="625"/>
-            <TextBlock HorizontalAlignment="Right" x:Name="differenzAnzeigeLebend" Visibility="Hidden" Margin="0,65,5,0" TextWrapping="Wrap" Text="+1000" VerticalAlignment="Top"/>
-            <TextBlock HorizontalAlignment="Right" x:Name="differenzAnzeigeTod" Visibility="Hidden" Margin="0,100,5,0" TextWrapping="Wrap" Text="+1000" VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,90,35,0" Height="20" Width="30" x:Name="weiss" Text="625"/>
+            <TextBlock HorizontalAlignment="Right" x:Name="differenzAnzeigeLebend" Visibility="Hidden" Margin="0,60,17.5,0" TextWrapping="Wrap" Text="+/-" VerticalAlignment="Top" Width="20" Height="15"/>
+            <TextBlock HorizontalAlignment="Right" x:Name="differenzAnzeigeTod" Visibility="Hidden" Margin="0,95,17.5,0" TextWrapping="Wrap" Text="+/-" VerticalAlignment="Top" Width="20" Height="15"/>
+            <TextBlock HorizontalAlignment="Right" x:Name="differenzAnzeige" Margin="0,75,7.5,0" Visibility="Hidden" TextWrapping="Wrap" Text="0" VerticalAlignment="Top"/>
         </Grid>
         <Border 
             BorderThickness="7"
